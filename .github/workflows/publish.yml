@@ -7,6 +7,14 @@ on:
 
 permissions:
   contents: read
+  # Trusted Publishing: rubygems.org accepts a short-lived OIDC token
+  # minted by GitHub Actions instead of a long-lived API key, so we
+  # never have to embed a RUBYGEMS_API_KEY (and never run into the
+  # MFA-OTP-in-CI problem that account-level MFA enforces).
+  # Configure once at https://rubygems.org/gems/payhub/trusted_publishers
+  # → "GitHub Actions" → repo safwatech/payhub-ruby, workflow
+  # publish.yml, environment (none).
+  id-token: write
 
 jobs:
   publish:
@@ -31,7 +39,7 @@ jobs:
       - run: bundle exec rspec
       - name: Build
         run: gem build payhub.gemspec
+      - name: Configure RubyGems trusted-publishing credentials
+        uses: rubygems/configure-rubygems-credentials@v1.0.0
       - name: Push
-        env:
-          GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
         run: gem push payhub-*.gem
