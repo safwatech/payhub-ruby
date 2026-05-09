@@ -19,7 +19,16 @@ jobs:
         with:
           ruby-version: '3.3'
           bundler-cache: true
-      - run: bundle exec rake test
+      - name: Stage shared test vectors at the path tests expect
+        run: |
+          # spec_helper.rb does Pathname.new(__dir__).join("..", "..", "shared", "test-vectors")
+          # — i.e. spec/../../shared/test-vectors which on the monorepo
+          # is sdks/shared/test-vectors. On the mirror, vectors live in
+          # vendor/shared/test-vectors/; stage a sibling 'shared/' so the
+          # path resolves identically.
+          mkdir -p ../shared
+          cp -R vendor/shared/test-vectors ../shared/
+      - run: bundle exec rspec
       - name: Build
         run: gem build payhub.gemspec
       - name: Push
