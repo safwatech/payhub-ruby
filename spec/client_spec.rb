@@ -21,7 +21,7 @@ RSpec.describe Payhub::Client do
       .with(headers: {"Authorization" => "Bearer phk_a.b"})
       .to_return(status: 201, body: body, headers: {"Content-Type" => "application/json"})
 
-    p = client.payments.create(psp: "sadad", merchant_order_ref: "ord-1", amount_minor: 4500)
+    p = client.payments.create({psp: "sadad", merchant_order_ref: "ord-1", amount_minor: 4500})
     expect(p.status).to eq("requires_action")
     expect(p.next_action).to be_a(Payhub::NextAction::OtpRequired)
     expect(stub).to have_been_requested
